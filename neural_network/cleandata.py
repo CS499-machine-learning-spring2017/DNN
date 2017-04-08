@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-import sys
+import os
 
 def getdemensions(data):
     data = data.strip().split(" ")
@@ -37,8 +36,20 @@ def cleanfile(file):
     data = infile.read()
     writefile(file, data, width)
 
-if __name__ == "__main__":
-    files = sys.argv[1:]
-    print("Files:", files)
+#files should be a list of files
+#returns a list of cleaned files
+def cleanmultiple(files):
     for file in files:
         cleanfile(file)
+    clean_files = []
+    for file in files:
+        clean_file = "cleaned_" + file
+        clean_files.append(clean_file)
+    return clean_files
+    
+#gets rid of the cleaned files for after they have been used
+def deletecleaned(clean_files):
+    print("Getting rid of cleaned files")
+    for file in clean_files:
+        os.remove(file)
+        print("removed ", file)
