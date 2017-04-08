@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+
 import tensorflow as tf
 import numpy as mp
 import sklearn.model_selection as sk #used to partition data
+import cleandata as cd
+import sys
 
 #Constants
 CLASSES = 3 #the number of possible classifications
@@ -17,7 +21,7 @@ def train_model(data_size, data, labels):
     X_train, X_test, Y_train, Y_test = sk.train_test_split(data, labels, test_size=0.33, random_state=42)
 
     # Specify that all features have real-value data
-    feature_columns = [tf.contrib.layers.real_valued_column("", dimension=6)]
+    feature_columns = [tf.contrib.layers.real_valued_column("", dimension=data_size)]
 
 
     #create a neural network based on constants
@@ -34,4 +38,11 @@ def train_model(data_size, data, labels):
     # Evaluate accuracy.
     accuracy_score = classifier.evaluate(x=X_test, y=Y_test)["accuracy"]
     print('Accuracy: {0:f}'.format(accuracy_score))
+    
+    return classifier
 
+if __name__ == "__main__":
+    files = sys.argv[1:]
+    clean_files = cd.cleanmultiple(files)
+    
+    #train_model()
