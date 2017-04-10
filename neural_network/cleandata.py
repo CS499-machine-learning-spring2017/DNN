@@ -49,7 +49,7 @@ def cleanmultiple(files):
     
 #gets rid of the cleaned files for after they have been used
 def deletecleaned(clean_files):
-    print("Getting rid of cleaned files")
+    #print("Getting rid of cleaned files")
     for file in clean_files:
         os.remove(file)
-        print("removed ", file)
+        #print("removed ", file)
