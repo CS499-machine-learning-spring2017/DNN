@@ -73,6 +73,8 @@ if __name__ == "__main__":
     
     
     #get the features and labels 
+    #POSSIBLE SOURCE OF ERRORS: IF PREPROCESS DOESN'T TAKE A LIST OF FILES, WE WILL NEED TO ADD
+    #A HELPER FUNCTION TO PREPROCESS MULTIPLE FILES
     features, labels = preprocessing.preprocess(feature_files, label_files, window_size)
     
     #partition data into training and testing sets
