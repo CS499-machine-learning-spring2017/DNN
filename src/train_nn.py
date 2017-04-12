@@ -17,6 +17,9 @@ from tensorflow.contrib.learn.python import SKCompat
 #Constants
 CLASSES = 3 #the number of possible classifications
 HIDDEN_UNITS = [10, 20, 10] #the topology of the neural network
+STEPS = 1000    #break the training data up into this number of batches to 
+                #run through training
+
 
 #inputs: data_size is an int describing the number of features (window width_size^2)
 #       data is the features
@@ -24,6 +27,7 @@ HIDDEN_UNITS = [10, 20, 10] #the topology of the neural network
 #outputs: returns the trained classifier
 #This file uses a basic Tensorflow classifier rather than the Tensorflow sess() feature
 #tutorial for this type of model can be found at https://www.tensorflow.org/get_started/tflearn
+#NOTE: THIS FUNCTION IS NOT WORKING CURRENTLY
 def train_base(data_size, data, labels):
     print("training model")
     
@@ -44,3 +48,44 @@ def train_base(data_size, data, labels):
     accuracy_score = classifier.evaluate(x=X_test, y=Y_test)["accuracy"]
     print('Accuracy: {0:f}'.format(accuracy_score))
     #return classifier
+
+
+
+#inputs: data_size is an int describing the number of features (window width_size^2)
+#       data is the features
+#       labels is the correct label
+#outputs: returns the trained classifier
+#basic tensorflow model using session() with 1 hidden layer
+#Based on Softmax Regression Model described here:
+#https://www.tensorflow.org/get_started/mnist/pros
+def train(data_size, data, labels):
+    batch_size = data_size/STEPS
+    
+    #initialize session
+    sess = tf.InteractiveSession()
+    
+    #model input and output
+    x = tf.placeholder(tf.float32, shape=[None, data_size])
+    y_ = tf.placeholder(tf.float32, shape=[None, CLASSES])
+    
+    #variables
+    W = tf.Variable(tf.zeros([784,10]))
+    b = tf.Variable(tf.zeros([10]))
+    sess.run(tf.global_variables_initializer())
+    
+    #model and loss
+    y = tf.matmul(x,W) + b
+    cross_entropy = tf.reduce_mean(
+                tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y))
+    
+    #train
+    train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+    for i in range(STEPS):
+        batch = batch_size*i
+        next_batch = batch_size*(i+1)-1
+        train_step.run(feeddict= {x: data[batch:next_batch], y_: labels[batch:next_batch]})
+
+    #need to finish evaluation function
+    
+    
+    
