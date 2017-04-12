@@ -66,10 +66,6 @@ if __name__ == "__main__":
     #IS THE SECTION THAT SHOULD BE MODIFIED
     X_train, X_test, Y_train, Y_test = sk.train_test_split(features, labels, test_size=0.33, random_state=42)
     
-    print("X =")
-    print(X_train)
-    print("Y =")
-    print(Y_train)
     #THIS IS WHERE THE PROBLEM IS OCCURRING
     train.train_base((window_size*window_size), X_train, Y_train)
     
