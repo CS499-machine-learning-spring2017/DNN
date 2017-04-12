@@ -54,11 +54,15 @@ def train_base(data_size, data, labels):
 #inputs: data_size is an int describing the number of features (window width_size^2)
 #       data is the features
 #       labels is the correct label
-#outputs: returns the trained classifier
+#       destination is the folder that you want to save the model to
+#outputs: saves the model to the specified destination file
+#       Will save to 'destination.meta'
 #basic tensorflow model using session() with 1 hidden layer
 #Based on Softmax Regression Model described here:
 #https://www.tensorflow.org/get_started/mnist/pros
-def train(data_size, data, labels):
+#Example of save/restore function can be found here:
+#http://stackoverflow.com/questions/33759623/tensorflow-how-to-save-restore-a-model
+def train(data_size, data, labels, destination):
     batch_size = data_size/STEPS
     
     #initialize session
@@ -82,10 +86,14 @@ def train(data_size, data, labels):
     train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
     for i in range(STEPS):
         batch = batch_size*i
-        next_batch = batch_size*(i+1)-1
-        train_step.run(feeddict= {x: data[batch:next_batch], y_: labels[batch:next_batch]})
+        end_batch = batch_size*(i+1)-1
+        train_step.run(feeddict= {x: data[batch:end_batch], y_: labels[batch:end_batch]})
 
-    #need to finish evaluation function
+    #save model
+    tf.add_to_collection('vars', W)
+    tf.add_to_collection('vars', b)
+    saver = tf.Saver()
+    saver.save(sess, destination)
     
     
     
