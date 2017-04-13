@@ -1,5 +1,15 @@
 #!/usr/bin/env python
 
+'''
+Main.py
+The purpose of this file is to manage the commandline arguments and
+call the appropriate functions from the other files
+
+This file only contains a function to parse the arguments and control the 
+high-level logic of the program (ie. train the model with the data provided
+and perform the desired function with the resulting model)
+'''
+
 import tensorflow as tf
 import numpy as np
 import sklearn.model_selection as sk #used to partition data
@@ -7,29 +17,38 @@ import cleandata as cd
 import preprocessing
 import train_nn as train
 import sys
-
-
-#this was initially used when basic_nn could take in multiple files
-#seperate files into training files (end with .input) and label files (end with .alpha)
-def seperate_files(files):
-    feature_files = []
-    label_files = []
-    for file in clean_files:
-        if ".input" in str(file):
-            feature_files.append(file)
-        elif ".alpha" in str(file):
-            label_files.append(file)
-        else:
-            except_message = str(file) + " does not end with '.input' or '.alpha'"
-            raise Exception(except_message)
-    
-    return feature_files, label_files
-
     
     
-    
-##usage: python basic_nn <window size> <number of examples> <feature file> <label file>
-#window size should be the length of the size of the window (ie. the number of features = window_size^2)
+############################################################
+#########               USAGE           ####################
+############################################################
+#python main.py <window size> <training file> <training labels> <number of examples>
+#inputs:    window size- the length of a side of the window. 
+#               # of features= window_size^2
+#           training file- contains the raw data to extract features from
+#           training labels- contains the labels for the training file. There 
+#               will be 1 label per window (extracted in preprocessing.py)
+#           number of examples- the number of examples you want to extract from
+#               training file. NOTE: IF NUMBER OF EXAMPLES IS LARGER THAN 
+#               AVAIABLE DATA, THE PROGRAM WILL CRASH
+#options:
+#(-p) <percent>: 
+#       Splits training data into training/testing sets, where <percent>% of 
+#       data is used for testing
+#       UNFINISHED
+#(-t) <testing file> <testing labels> <number of examples>: 
+#       Allow user to specify testing file to take <number of examples> from
+#       UNFINISHED
+#(-s) <destination file>: Allow user to specify that model should be 
+#       outputted to file specified by user
+#       UNFINISHED
+#(-r) <restore file>: Allow user to specify that model should be 
+#       restored from file and then trained
+#       UNFINISHED
+#(-c) Allow user to customize the connections
+#       UNFINISHED
+#(-h) Display command line options
+#       UNFINISHED
 if __name__ == "__main__":
     input_file = str(sys.argv[3])
     label_file = str(sys.argv[4])
@@ -37,14 +56,7 @@ if __name__ == "__main__":
     num_examples = int(sys.argv[2])
     
     
-    #this was initially used when basic_nn could take in multiple files
-    '''#seperate files into training files (end with .input) and label files (end with .alpha)
-    feature_files, label_files = seperate_files(clean_files)'''
-    
-    
     #get the generator for features and labels
-    #POSSIBLE SOURCE OF ERRORS: IF PREPROCESS DOESN'T TAKE A LIST OF FILES, WE WILL NEED TO ADD
-    #A HELPER FUNCTION TO PREPROCESS MULTIPLE FILES
     generator = preprocessing.preprocess(input_file, label_file, window_size)
 
     features =[]

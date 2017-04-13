@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+'''
+Preprocessing.py
+This file contains functions necessary to take data from a csv format and get
+it into a form (lists) that it can be fed into tensorflow
+'''
+
 from os import path
 import csv
 import sys
@@ -24,6 +30,7 @@ class GroupData(object):
                 break
             else:
                 yield (newline, newclassifier)
+
 
 class Data(object):
     '''
@@ -128,7 +135,7 @@ def saveToFile(filename, data, lineLength):
 
 
 def cleanBinary(file):
-    '''cleans the binary file as in converts from binary to integers'''
+    '''cleans the binary file; converts from binary to integers'''
     binaryfile = open(file, "rb")
     width, height = getDemensions(binaryfile)
     cleaneddata = cleandata(binaryfile.read())
