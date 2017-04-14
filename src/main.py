@@ -14,10 +14,10 @@ import tensorflow as tf
 import numpy as np
 import sklearn.model_selection as sk #used to partition data
 import cleandata as cd
-import preprocessing
 import train_nn as train
 import sys
     
+from preprocessing import preprocessing
     
 ############################################################
 #########               USAGE           ####################
