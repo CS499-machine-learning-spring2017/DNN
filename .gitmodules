@@ -1,0 +1,3 @@
+[submodule "src/preprocessing"]
+	path = src/preprocessing
+	url = git@github.com:CS499-machine-learning-spring2017/preprocessing.git
