@@ -80,7 +80,7 @@ def create_subconnected_layer(x, weights, biases, num_subgraphs):
 #               of the previous layer. This is one of the things that will be 
 #               trained.
 #outputs: returns predictions class labels 
-def multilayer_perceptron(x, weights, biases):
+def multilayer_perceptron(x, weights, biases, layer_1_subgraphs, layer_2_subgraphs):
     # Hidden layer with RELU activation
     layer_1 = create_subconnected_layer(x, weights['h1'], biases['b1'], layer_1_subgraphs)
     print(layer_1.get_shape().as_list())
@@ -139,7 +139,7 @@ def train_mp(window_size, input_file, label_file, num_examples):
 
 
     # Construct model
-    y = multilayer_perceptron(x, weights, biases)   #y contains the predicted outputs
+    y = multilayer_perceptron(x, weights, biases, layer_1_subgraphs, layer_2_subgraphs)   #y contains the predicted outputs
                                                 #which will be compared to the 
                                                 #ground-truth, y_
 
