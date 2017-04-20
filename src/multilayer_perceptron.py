@@ -26,6 +26,8 @@ BATCH_SIZE = 9 #how many data points to run through between each
 # Network Parameters
 n_hidden_1 = 9 # number of nodes in 1st layer
 n_hidden_2 = 9 # number of nodes in 2nd layer
+layer_1_subgraphs = 3 # How many fully connected subgraphs in layer 1?
+layer_2_subgraphs = 1 # How many fully connected subgraphs in layer 2?
 #data_size =  window_size #number of features SHOULDN'T BE A CONSTANT
 CLASSES = 3 #possible classifications to choose between
 
@@ -80,7 +82,7 @@ def create_subconnected_layer(x, weights, biases, num_subgraphs):
 #               of the previous layer. This is one of the things that will be 
 #               trained.
 #outputs: returns predictions class labels 
-def multilayer_perceptron(x, weights, biases, layer_1_subgraphs, layer_2_subgraphs):
+def multilayer_perceptron(x, weights, biases):
     # Hidden layer with RELU activation
     layer_1 = create_subconnected_layer(x, weights['h1'], biases['b1'], layer_1_subgraphs)
     print(layer_1.get_shape().as_list())
@@ -107,6 +109,7 @@ if __name__ == "__main__":
     label_file = str(sys.argv[4])
     window_size = int(sys.argv[1])
     num_examples = int(sys.argv[2])
+    train_mp(window_size, input_file, label_file, num_examples)
 
 
 def train_mp(window_size, input_file, label_file, num_examples):
@@ -116,8 +119,6 @@ def train_mp(window_size, input_file, label_file, num_examples):
 
 
     # Create model with subgraphs
-    layer_1_subgraphs = 3 # How many fully connected subgraphs in layer 1?
-    layer_2_subgraphs = 1 # How many fully connected subgraphs in layer 2?
     assert window_size % layer_1_subgraphs == 0
     assert n_hidden_1 % layer_1_subgraphs == 0
     assert n_hidden_2 % layer_2_subgraphs == 0
@@ -139,7 +140,7 @@ def train_mp(window_size, input_file, label_file, num_examples):
 
 
     # Construct model
-    y = multilayer_perceptron(x, weights, biases, layer_1_subgraphs, layer_2_subgraphs)   #y contains the predicted outputs
+    y = multilayer_perceptron(x, weights, biases)   #y contains the predicted outputs
                                                 #which will be compared to the 
                                                 #ground-truth, y_
 
