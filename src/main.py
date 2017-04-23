@@ -16,8 +16,82 @@ import sklearn.model_selection as sk #used to partition data
 import cleandata as cd
 import train_nn as train
 import sys
-    
+import ast
+
 from preprocessing import preprocessing
+from collections import namedtuple
+
+class GraphConfiguration(object):
+    # All available options from the config file
+    availableOptions = ['layers', 'node','subgraphs', 'classes','iterations','batch_size','training_rate']
+    # named tuple containing the available options
+    configOptions = namedtuple('configOptions', availableOptions)
+
+    # Defaults for config options, it will default to nothing as this will probably
+    # break the program
+    defaultSpecs = {'layers': 0, 'node':[], 'subgraphs':[], 'classes':0, 'iterations':0, 'batch_size':0}
+
+    def __init__(self, file):
+        # config file
+        self.file = file
+
+    def read(self):
+        if os.path.isfile(self.file):
+            # open config file
+            infile = open(self.file, "r")
+            #read in the data
+            data = infile.read()
+            # break the data into a list
+            options = data.strip().split('\n')
+            # Find the options in the config file
+            config = self.__extractOptions(options)
+            # returns a named tuple for easy accessing
+            return self.configOptions( **config )
+
+    def __extractOptions(self, options):
+        '''
+        options is a list of options found in the config file
+        each option should follow the same convention of
+        <name>\s<specification>
+        '''
+        extracted = {}
+        for option in options:
+            # Find the space in the option
+            space = option.index(' ')
+            # Find the lower case name in the raw option
+            name = option[0:space].lower()
+            # raise an Error if the name isn't valid
+            if name not in self.availableOptions:
+                raise Exception("{} is not a valid configuration option".format(name))
+            else:
+                # get the rest of the option by itself away from the name
+                rawSpec = option[space:]
+                # find the specifications from the string
+                specification = self.__findSpecification(rawSpec)
+                # save the specification
+                extracted[name] = specification
+        # fill in the values that weren't included and return
+        return self.__fillInSpecs(extracted)
+
+    def __findSpecification(self, spec):
+        '''Finds the specification from a string'''
+        # replace all spaces with no spaces for ast.literal_eval to work
+        spec = spec.replace(' ', '')
+        # find the value from string,
+        # Will be able to extract all available python types
+        # from a string
+        return ast.literal_eval(spec)
+
+
+    def __fillInSpecs(self, configOptions):
+        '''
+        Fills in the default values that
+        weren't included in the config file
+        '''
+        for option in self.availableOptions:
+            if option not in configOptions:
+                configOptions[option] = self.defaultSpecs[option]
+        return configOptions
 
 ###########################################################
 #########       OPTION: -p          #######################
