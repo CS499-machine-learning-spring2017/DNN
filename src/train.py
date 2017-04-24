@@ -1,11 +1,92 @@
-#This file is for testing a function to allow the user to input the
-#topology of the network in addition to training data
+'''
+----------------------------------------------------------------------
+        Train.py
+----------------------------------------------------------------------
+This file contains the functions to create a customized neural network from
+a config file. 
 
+This is the main file for training neural networks and uses
+cleandata.py and preprocessing.py as helper files.
+
+
+----------------------------------------------------------------------
+        Tensorflow
+----------------------------------------------------------------------
+This program uses the open-source machine learning library Tensorflow. For an 
+introduction to tensorflow, see
+            https://www.tensorflow.org/get_started/get_started
+Example of creating subgraphs can be found here:
+            https://github.com/aymericdamien/TensorFlow-Examples/
+Example of save/restore function can be found here:
+            http://stackoverflow.com/questions/33759623/tensorflow-how-to-save-restore-a-model
+
+
+------------------------------------------------------------------------
+        Command Line
+------------------------------------------------------------------------        
+For the command line input, the user should input a config file containing 
+window_size, input_file, label_file, num_examples, out_file, layers, nodes, 
+subgraphs, classes, iterations, batch_size, training_rate.
+
+This file can be called on the command line using
+        python train.py <config file>
+
+------------------------------------------------------------------------
+        Inputs/Outputs
+------------------------------------------------------------------------
+inputs:
+    window_size- the length of a side of the window being used to extract
+           data. The number of features should be window_size^2.
+           NOTE: MUST BE AN ODD NUMBER
+    input_file- the file containing the raw data
+    label_file- the file containing labels. For each window, the center 
+           number in label_file will be used as the label for the window
+    num_examples-the number of windows of data to extract from input_file 
+           and label_file. 
+           NOTE: IF THIS IS LARGER THAN THE AMOUNT OF AVAILABLE DATA IN THE
+           FILES PROVIDED, THE PROGRAM WILL CRASH
+    out_file- location where you want to save your model.
+    layers- integer describing number of hidden layers in the model
+    nodes- list of integers describing the number of nodes in each hidden 
+           layer. For example, nodes[0] is the number of nodes in the first
+           hidden layer. len(nodes) MUST BE EQUAL TO THE NUMBER OF LAYERS
+           We will later define node[0] as the data_size and push all of the
+           elements of nodes forward by 1
+    subgraphs- number of subgraphs each layer should be split into. For example,
+           subgraphs[1] is the number of subgraphs in the first hidden layer
+           should be split into. 
+           THE NUMBER OF SUBGRAPHS IN EACH LAYER MUST
+           EVENLY DIVIDE BOTH THE NUMBER OF NODES IN THE PREVIOUS LAYER AND
+           THE NUMBER OF NODES IN THE CURRENT LAYER (for example, if layer1
+           has 30 nodes and layer 2 has 10 nodes, subgraphs[1] can only be
+           2, 5, or 10. In other words nodes[n-1] % subgraphs[n] == 0 and
+           nodes[n] % subgraphs[n] == 0).
+           THE FINAL ITEM IN SUBGRAPHS MUST ALSO EVENLY DIVIDE THE NUMBER
+           OF CLASSES
+           We will later define subgraphs[0] as 1 and push all of the 
+           elements of subgraphs forward by 1
+    classes- the number of possible classifications for the data
+    iterations- the number of times to run through the training data before 
+           stopping. On each pass all of the data will be used to update the
+           model.
+    batch_size- the number of examples to consider at each step before updating
+           the model. 
+           NOTE: batch_size MUST EVENLY DIVIDE num_examples
+    training_rate- how quickly the model will update after each batch. A low 
+           training rate will cause the model parameters to converge more 
+           slowly.
+           NOTE: IF training_rate IS TOO HIGH, THE MODEL PARAMETERS MAY NOT
+           CONVERGE, WHICH WILL MAKE THE MODEL UNABLE TO CLASSIFY ANYTHING
+outpots:
+    saves the trained model to out_file.
+    outputs statistics about the time it takes to train the model and how well
+        the model fits the training data
+'''
 from __future__ import print_function
-import sklearn.model_selection as sk #used to partition data
 import numpy as np
 import cleandata
 from preprocessing import preprocessing
+import main
 import tensorflow as tf
 import pdb
 import sys
@@ -24,7 +105,7 @@ import time
 #       a fully-connected layer would.
 #For documentation on slicing and joining see 
 #https://www.tensorflow.org/api_guides/python/array_ops
-#inputs:x- the previous layer that you want to connect to your subconnected layer
+#inputs:indata- the previous layer that you want to connect to your subconnected layer
 #       weights- the tensorflow variable determining the strength of the connections 
 #               from the previous layer to this one. This is one of the things that
 #               will be trained.
@@ -36,16 +117,16 @@ import time
 #               will recieve 1/num_subgraphs of the outputs from the previous layer
 #outputs: returns the subconnected layer
 
-def create_subconnected_layer(x, weights, biases, num_subgraphs):
-    slice_size = int(int(x.get_shape()[1]) / num_subgraphs)
+def create_subconnected_layer(indata, weights, biases, num_subgraphs):
+    slice_size = int(int(indata.get_shape()[1]) / num_subgraphs)
     layer_list = [] #Will contain all of the slices
     for s in range(0, num_subgraphs):
         #create a slice of size slice_size starting at s*slice_size
-        x_slice = tf.slice(x, [0, s*slice_size], [-1, slice_size])
+        indata_slice = tf.slice(indata, [0, s*slice_size], [-1, slice_size])
         
         #create subgraph by multiplying by weights and adding in bias, as you
         #would with a fully-connected layer
-        subgraph = tf.add(tf.matmul(x_slice, weights[s]), biases[s])
+        subgraph = tf.add(tf.matmul(indata_slice, weights[s]), biases[s])
         subgraph = tf.nn.relu(subgraph)
         layer_list.append(subgraph)
     return tf.concat(layer_list, 1)
@@ -153,8 +234,9 @@ def train_mp(window_size, input_file, label_file, num_examples, out_file,
     window_size = int(window_size)
     num_examples = int(num_examples)
     layers = int(layers)
-    nodes = literal_eval(nodes)
-    subgraphs = literal_eval(subgraphs)
+    #git rid of any spaces in nodes and subgraphs so they cast correctly
+    nodes = literal_eval(str(nodes).replace(' ', ''))
+    subgraphs = literal_eval(str(subgraphs).replace(' ', ''))
     classes = int(classes)
     iterations = int(iterations)
     batch_size= int(batch_size)
@@ -308,6 +390,28 @@ def train_mp(window_size, input_file, label_file, num_examples, out_file,
 ############################################
 ##########      MAIN        ################
 ############################################
+#usage: python train.py <config file>
 if __name__ == "__main__":
-    train_mp(window_size, input_file, label_file, num_examples, out_file, 
-        layers, nodes, subgraphs, classes, iterations, batch_size, training_rate)
+    #get arguments from the config file
+    config = main.GraphConfiguration(sys.argv[1])
+    config = config.read()
+    
+    #check to make sure values were given for all of the arguments in the config file
+    #NOTE: in_file DOESN'T HAVE TO BE CHECKED, BECAUSE IT IS ONLY FOR USE IN
+    #test.py
+    assert config.window_size != 0
+    assert config.input_file != ''
+    assert config.label_file != ''
+    assert config.out_file != 'DEFAULT'
+    assert config.layers != 0
+    assert config.nodes != []
+    assert config.subgraphs != []
+    assert config.classes != 0
+    assert config.iterations != 0
+    assert config.batch_size != 0
+    assert config.training_rate != 0
+    
+    train_mp(config.window_size, config.input_file, config.label_file, 
+        config.num_examples, config.out_file, config.layers, config.nodes, 
+        config.subgraphs, config.classes, config.iterations, config.batch_size,
+        config.training_rate)

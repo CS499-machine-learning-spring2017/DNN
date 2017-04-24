@@ -12,10 +12,9 @@ and perform the desired function with the resulting model)
 
 import tensorflow as tf
 import numpy as np
-import sklearn.model_selection as sk #used to partition data
 import cleandata as cd
-import train_nn as train
 import sys
+import os
 import ast
 
 from preprocessing import preprocessing
@@ -23,13 +22,20 @@ from collections import namedtuple
 
 class GraphConfiguration(object):
     # All available options from the config file
-    availableOptions = ['layers', 'node','subgraphs', 'classes','iterations','batch_size','training_rate']
+    availableOptions = ['window_size', 'input_file', 'label_file', 'num_examples',
+        'out_file', 'in_file', 'layers', 'nodes','subgraphs', 'classes',
+        'iterations','batch_size','training_rate']
     # named tuple containing the available options
     configOptions = namedtuple('configOptions', availableOptions)
 
     # Defaults for config options, it will default to nothing as this will probably
     # break the program
-    defaultSpecs = {'layers': 0, 'node':[], 'subgraphs':[], 'classes':0, 'iterations':0, 'batch_size':0}
+    #the exception is that out_file will default to 'DEFAULT' and in_file will
+    #default to 'DEFAULT.meta'
+    defaultSpecs = {'window_size':0, 'input_file':'', 'label_file':'', 
+    'num_examples':0, 'out_file':'DEFAULT', 'in_file':'DEFAULT.meta',
+    'layers': 0, 'nodes':[], 'subgraphs':[], 'classes':0, 'iterations':0, 
+    'batch_size':0, 'training_rate':0}
 
     def __init__(self, file):
         # config file
@@ -56,7 +62,7 @@ class GraphConfiguration(object):
         '''
         extracted = {}
         for option in options:
-            # Find the space in the option
+            # Find the '=' in the option
             space = option.index(' ')
             # Find the lower case name in the raw option
             name = option[0:space].lower()
@@ -75,7 +81,7 @@ class GraphConfiguration(object):
 
     def __findSpecification(self, spec):
         '''Finds the specification from a string'''
-        # replace all spaces with no spaces for ast.literal_eval to work
+        # replace all seperaters with no spaces for ast.literal_eval to work
         spec = spec.replace(' ', '')
         # find the value from string,
         # Will be able to extract all available python types
