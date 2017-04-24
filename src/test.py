@@ -87,6 +87,7 @@ from __future__ import print_function
 import numpy as np
 import cleandata
 from preprocessing import preprocessing
+import main
 import tensorflow as tf
 import pdb
 import sys
@@ -228,8 +229,9 @@ def test_mp(window_size, input_file, label_file, num_examples, in_file,
     window_size = int(window_size)
     num_examples = int(num_examples)
     layers = int(layers)
-    nodes = literal_eval(nodes)
-    subgraphs = literal_eval(subgraphs)
+    #git rid of any spaces in nodes and subgraphs so they cast correctly
+    nodes = literal_eval(str(nodes).replace(' ', ''))
+    subgraphs = literal_eval(str(subgraphs).replace(' ', ''))
     classes = int(classes)
     iterations = int(iterations)
     batch_size= int(batch_size)
@@ -338,8 +340,6 @@ def test_mp(window_size, input_file, label_file, num_examples, in_file,
         
     # Launch the graph
     with tf.Session() as sess:
-        sess.run(init)
-        
         #load the data from in_file
         loader = tf.train.import_meta_graph(in_file)
         loader.restore(sess, tf.train.latest_checkpoint('./'))
@@ -348,10 +348,32 @@ def test_mp(window_size, input_file, label_file, num_examples, in_file,
         print("The test error was", (total_error/num_examples)) 
     
         
-
 ############################################
 ##########      MAIN        ################
 ############################################
+#usage: python test.py <config file>
 if __name__ == "__main__":
-    train_mp(window_size, input_file, label_file, num_examples, in_file, 
-        layers, nodes, subgraphs, classes, iterations, batch_size, training_rate)
+    #get arguments from the config file
+    config = main.GraphConfiguration(sys.argv[1])
+    config = config.read()
+    
+    #check to make sure values were given for all of the arguments in the config file
+    #NOTE: in_file DOESN'T HAVE TO BE CHECKED, BECAUSE IT IS ONLY FOR USE IN
+    #test.py
+    assert config.window_size != 0
+    assert config.input_file != ''
+    assert config.label_file != ''
+    assert config.in_file != 'DEFAULT.meta'
+    assert config.layers != 0
+    assert config.nodes != []
+    assert config.subgraphs != []
+    assert config.classes != 0
+    assert config.iterations != 0
+    assert config.batch_size != 0
+    assert config.training_rate != 0
+    
+    test_mp(config.window_size, config.input_file, config.label_file, 
+        config.num_examples, config.in_file, config.layers, config.nodes, 
+        config.subgraphs, config.classes, config.iterations, config.batch_size,
+        config.training_rate)
+        
