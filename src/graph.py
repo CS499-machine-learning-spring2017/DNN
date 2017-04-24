@@ -1,6 +1,5 @@
 '''
-Purpose: Collect error, number of layers, number of subconnected layers, number of nodes per layer, learning_rate, batch_size, window_size, iterations, and run time
-to help users visualize how each variable affects the accuracy of the network.
+Purpose: Save user input, runtime, and error and print graphs depicting how error changes with user input and runtime changes with data size.
 '''
 import csv
 import numpy as np
@@ -18,8 +17,9 @@ runtime_arr = []
 data_size_arr = []
 error_arr = []
 
-
-
+'''
+Purpose: Appends user data to csv file. If file does not exist, create one. 
+'''
 def save_data(num_layers, num_subconnected,nodes_per_layer, nodes_per_subconnected, batch_size, learning_rate,window_size,iterations, error, runtime, data_size):
 	try: 
 		with open('SavedData', 'a') as csvfile:
@@ -32,6 +32,9 @@ def save_data(num_layers, num_subconnected,nodes_per_layer, nodes_per_subconnect
 			netWriter = csv.writer(csvfile, delimiter=',')
 			netWriter.writerow(arr)		
 
+'''
+Purpose: Plot various graphs
+'''
 def graphResults(x, y, plot_name, x_label, y_label):
 	font = {'family': 'serif',
         'color':  'darkred',
@@ -48,6 +51,9 @@ def graphResults(x, y, plot_name, x_label, y_label):
 	plt.subplots_adjust(left=0.15)
 	plt.show()
 
+'''
+Purpose: Reads csv file into arrays for plotting and graphs results
+'''
 def graphNet():
 	with open('savedData', newline='') as csvfile:
 		netReader = csv.reader(csvfile, delimiter=',')
