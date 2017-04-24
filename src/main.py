@@ -252,7 +252,9 @@ options:
        UNFINISHED
 (-c) Allow user to customize the connections
        UNFINISHED
-(-h) Display command line options'''
+(-h) Display command line options
+(-f) <config file>: Allow the user to enter a config file with specifications on how the network should be configured
+'''
             print(help_message)
             exit(0)
         else:
@@ -267,6 +269,14 @@ options:
     training_labels = str(sys.argv[3])
     num_examples = int(sys.argv[4])
     option = sys.argv[5]    #option should be one from the list above
+
+    ###########################
+    #OPTION -f
+    ###########################
+    if ('-f' in sys.argv):
+        configFile = sys.argv.index('-f') + 1
+        config = GraphConfiguration(configFile)
+
     
     ############################
     #OPTION -p
