@@ -86,7 +86,7 @@ from __future__ import print_function
 import numpy as np
 import cleandata
 from preprocessing import preprocessing
-import main
+import readconfig
 import tensorflow as tf
 import pdb
 import sys
@@ -393,7 +393,7 @@ def train_mp(window_size, input_file, label_file, num_examples, out_file,
 #usage: python train.py <config file>
 if __name__ == "__main__":
     #get arguments from the config file
-    config = main.GraphConfiguration(sys.argv[1])
+    config = readconfig.GraphConfiguration(sys.argv[1])
     config = config.read()
     
     #check to make sure values were given for all of the arguments in the config file
