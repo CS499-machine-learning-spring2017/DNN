@@ -36,25 +36,17 @@ import time
 #outputs: returns the subconnected layer
 
 def create_subconnected_layer(x, weights, biases, num_subgraphs):
-    print("input shape=", x.get_shape())
-    print("subgraphs =", num_subgraphs)
     slice_size = int(int(x.get_shape()[1]) / num_subgraphs)
     layer_list = [] #Will contain all of the slices
     for s in range(0, num_subgraphs):
         #create a slice of size slice_size starting at s*slice_size
         x_slice = tf.slice(x, [0, s*slice_size], [-1, slice_size])
         
-        print('shape of x_slice=', x_slice.get_shape())
-        print('shape of weight[%s]=' % s, weights[s].get_shape())
         #create subgraph by multiplying by weights and adding in bias, as you
         #would with a fully-connected layer
         subgraph = tf.add(tf.matmul(x_slice, weights[s]), biases[s])
         subgraph = tf.nn.relu(subgraph)
         layer_list.append(subgraph)
-    #debug
-    print("layer sublayers")
-    for layer in layer_list:
-        print(layer.get_shape())
     return tf.concat(layer_list, 1)
 
 
@@ -87,7 +79,6 @@ def multilayer_perceptron(x, layers, weights, biases, subgraphs):
         #layer. This is why we defined hidden_layers[0] as x
         curr_layer = create_subconnected_layer(hidden_layers[i-1],
                                 weights[weights_vars], biases[biases_vars], subgraphs[i])
-        print("shape of curr layer=",curr_layer.get_shape())
         hidden_layers.append(curr_layer)
         
 
