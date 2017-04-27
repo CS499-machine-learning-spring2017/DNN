@@ -51,6 +51,10 @@ class GraphConfiguration(object):
             options = data.strip().split('\n')
             # Find the options in the config file
             config = self.__extractOptions(options)
+            # Replaces the requirement of having layers in the 
+            # config file. This will set the layers to the lenght
+            # of nodes
+            config['layers'] = len(config['node'])
             # returns a named tuple for easy accessing
             return self.configOptions( **config )
 
