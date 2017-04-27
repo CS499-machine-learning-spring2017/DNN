@@ -88,6 +88,9 @@ import numpy as np
 import cleandata
 from preprocessing import preprocessing
 import readconfig
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'  #deactivates several warnings about 
+                                        #the instructions used to compile
 import tensorflow as tf
 import pdb
 import sys
