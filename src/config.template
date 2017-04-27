@@ -1,4 +1,9 @@
-LAYERS 4
+WINDOW_SIZE 1
+INPUT_FILE example.input
+LABEL_FILE example.alpha
+NUM_EXAMPLES 0
+OUT_FILE outfile.meta
+IN_FILE test.py
 NODE [1,4,55, 38]
 SUBGRAPHS [211, 3,4,5]
 CLASSES 0
