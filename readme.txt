@@ -1,6 +1,9 @@
 This program is designed to learn a neural network for image classification.
 The program uses the open source library Tensorflow (https://www.tensorflow.org/).
 
+Github repo can be found at 
+    https://github.com/CS499-machine-learning-spring2017/DNN
+
 #################################################################
 ###########         INSTALLATION        #########################
 #################################################################
