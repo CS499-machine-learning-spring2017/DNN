@@ -48,7 +48,7 @@ inputs:
            and label_file. 
            NOTE: IF THIS IS LARGER THAN THE AMOUNT OF AVAILABLE DATA IN THE
            FILES PROVIDED, THE PROGRAM WILL CRASH
-    in_file- location where you want to save your model.
+    in_file- location to load your model from.
     layers- integer describing number of hidden layers in the model
     nodes- list of integers describing the number of nodes in each hidden 
            layer. For example, nodes[0] is the number of nodes in the first
@@ -344,6 +344,8 @@ def test_mp(window_size, input_file, label_file, num_examples, in_file,
     # Launch the graph
     with tf.Session() as sess:
         #load the data from in_file
+        #NOTE: IF RUNNING ON A DIFFERENT MACHINE THAN IT WAS TRAINED ON, ADD
+        #"clear_devices=true" into the arguments for import_meta_graph
         loader = tf.train.import_meta_graph(in_file)
         loader.restore(sess, tf.train.latest_checkpoint('./'))
         
