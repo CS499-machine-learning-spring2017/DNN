@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-Main.py
+read_config.py
 The purpose of this file is to manage the commandline arguments and
 call the appropriate functions from the other files
 
