@@ -54,7 +54,7 @@ class GraphConfiguration(object):
             # Replaces the requirement of having layers in the 
             # config file. This will set the layers to the lenght
             # of nodes
-            config['layers'] = len(config['node'])
+            config['layers'] = len(config['nodes'])
             # returns a named tuple for easy accessing
             return self.configOptions( **config )
 
