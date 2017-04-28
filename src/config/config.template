@@ -1,7 +1,7 @@
 WINDOW_SIZE 1
-INPUT_FILE example.input
-LABEL_FILE example.alpha
-NUM_EXAMPLES 0
+INPUT_FILE data/1.input
+LABEL_FILE data/1.alpha
+NUM_EXAMPLES 10000
 OUT_FILE outfile.meta
 IN_FILE test.py
 NODE [1,4,55, 38]
